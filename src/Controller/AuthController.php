@@ -69,13 +69,15 @@ class AuthController extends AbstractController
 
 
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['token' => $token]);
-
-        if ($user) {
-            $user->setToken(null);
-            $this->entityManager->flush();
+		
+		if (!$user) {
+            return $this->json(['message' => 'Invalid token'], Response::HTTP_UNAUTHORIZED);
         }
-
-        return $this->json(['message' => 'Logged out successfully']);
+		
+        $user->setToken(null);
+        $this->entityManager->flush();
+        
+		return $this->json(['message' => 'Logged out successfully']);
     }
 
     private function getTokenFromRequest(Request $request): ?string
